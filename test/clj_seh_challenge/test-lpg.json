@@ -1,0 +1,166 @@
+{
+  "nodes": [
+    "fred",
+    "barney",
+    "roger",
+    "dan",
+    "sarah",
+    "jim",
+    "ron"
+  ],
+  "edges": [
+    [
+      "fred",
+      "barney"
+    ],
+    [
+      "fred",
+      "roger"
+    ],
+    [
+      "fred",
+      "dan"
+    ],
+    [
+      "fred",
+      "bob"
+    ],
+    [
+      "sarah",
+      "jim"
+    ],
+    [
+      "sarah",
+      "ron"
+    ],
+    [
+      "sarah",
+      "david"
+    ],
+    [
+      "david",
+      "shellfish"
+    ],
+    [
+      "bob",
+      "fun"
+    ],
+    [
+      "ron",
+      "dairy"
+    ],
+    [
+      "david",
+      "indian"
+    ],
+    [
+      "bob",
+      "mexican"
+    ],
+    [
+      "fred",
+      "mexican"
+    ],
+    [
+      "barney",
+      "thai"
+    ],
+    [
+      "roger",
+      "indian"
+    ],
+    [
+      "dan",
+      "indian"
+    ],
+    [
+      "sarah",
+      "texmex"
+    ],
+    [
+      "jim",
+      "french"
+    ],
+    [
+      "ron",
+      "french"
+    ]
+  ],
+  "attrs": {
+    "jim": {
+      "french": {
+        "prefers": true
+      }
+    },
+    "roger": {
+      "indian": {
+        "prefers": true
+      }
+    },
+    "ron": {
+      "dairy": {
+        "allergic-to": true
+      },
+      "french": {
+        "prefers": true
+      }
+    },
+    "bob": {
+      "fun": {
+        "allergic-to": true
+      },
+      "mexican": {
+        "prefers": true
+      }
+    },
+    "david": {
+      "shellfish": {
+        "allergic-to": true
+      },
+      "indian": {
+        "prefers": true
+      }
+    },
+    "barney": {
+      "thai": {
+        "prefers": true
+      }
+    },
+    "sarah": {
+      "jim": {
+        "manages": true
+      },
+      "ron": {
+        "manages": true
+      },
+      "david": {
+        "manages": true
+      },
+      "texmex": {
+        "prefers": true
+      }
+    },
+    "fred": {
+      "barney": {
+        "manages": true
+      },
+      "roger": {
+        "manages": true
+      },
+      "dan": {
+        "manages": true
+      },
+      "bob": {
+        "manages": true
+      },
+      "mexican": {
+        "prefers": true
+      }
+    },
+    "dan": {
+      "indian": {
+        "prefers": true
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
     [clojure.test :refer :all]
     [loom.io :as loom-io])
   (:import
+    (clj_seh_challenge.lpg LPG-Timbre-Logger)
     (java.util
       Date)))
 
@@ -220,7 +221,7 @@
 (deftest lpg:scratch
 
   (testing "clj can pass simple scenario"
-    (lpg:simple-test (lpg/->lpg:scratch)))
+    (lpg:simple-test (lpg/->lpg:scratch (LPG-Timbre-Logger.))))
   (testing "clj can perf test"
     (lpg:simple-perf (lpg/->lpg:scratch)))
   (testing "clj can de/serialize"

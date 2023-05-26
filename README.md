@@ -27,6 +27,7 @@ lein test
 
 output:
 ``` 
+...[logging]...
 lein test clj-seh-challenge.core-test
 Simple Test Took  clj_seh_challenge.lpg.LPG:Scratch  :  0.004  s
 Perf Test Took  clj_seh_challenge.lpg.LPG:Scratch  :  0.284  s
@@ -53,6 +54,9 @@ See the test namespace for more documentation about the tests.
 ```
 (let [;; Instantiate
       g                    (lpg/->lpg:scratch)
+      
+      ;; For a noisier, logging version, provide a logging implementation that emits logs:
+      g                    (lpg/->lpg:scratch (lpg/LPG-Timbre-Logger.))
 
       ;; Add nodes: the data structure is immutable, calling a mutating method (like add-node) returns a new one containing updated internal state
       g                    (->

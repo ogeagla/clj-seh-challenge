@@ -3,7 +3,53 @@
     [cheshire.core :as json]
     [loom.attr :as loom-attr]
     [loom.derived :as loom-derived]
-    [loom.graph :as loom-graph]))
+    [loom.graph :as loom-graph]
+    [taoensso.timbre :as t-log]))
+
+
+(defprotocol LPG-Logger
+
+  (info [this msg])
+
+  (log [this msg])
+
+  (warn [this msg])
+
+  (error [this msg]))
+
+
+(defrecord LPG-Timbre-Logger
+  []
+
+  LPG-Logger
+
+  (info [this msg] (t-log/info msg))
+
+
+  (log [this msg] (t-log/log msg))
+
+
+  (warn [this msg] (t-log/warn msg))
+
+
+  (error [this msg] (t-log/error msg)))
+
+
+(defrecord LPG-Noop-Logger
+  []
+
+  LPG-Logger
+
+  (info [this msg])
+
+
+  (log [this msg])
+
+
+  (warn [this msg])
+
+
+  (error [this msg]))
 
 
 (defprotocol LPG
@@ -83,7 +129,7 @@
 
 
 (defrecord LPG:Loom
-  [g]
+  [g logger]
 
   LPG
 
@@ -101,6 +147,7 @@
   (get-nodes-query
     [this {by-outgoing-edge-attrs :by-outgoing-edge-attrs
            :as                    query}]
+    (info logger [::get-nodes-query query])
     (->>
       (loom-derived/edges-filtered-by (fn [[n1 n2]]
                                         (by-outgoing-edge-attrs (get-attrs-for-edge this [n1 n2]))) g)
@@ -114,6 +161,7 @@
            g-map      :map
            g-reduce   :reduce
            :as        query}]
+    (info logger [::aggregate-nodes-query query])
     (if g-group-by
       (->> g
            (loom-derived/edges-filtered-by
@@ -141,11 +189,13 @@
 
   (add-node
     [this node]
+    (info logger [::add-node node])
     (assoc this :g (loom-graph/add-nodes g node)))
 
 
   (add-attr-to-edge
     [this edge attr-key]
+    (info logger [::add-attr-to-edge edge attr-key])
     (assoc this :g (loom-attr/add-attr-to-edges
                      (loom-graph/add-edges g edge)
                      attr-key
@@ -201,13 +251,15 @@
 
 
 (defn ->lpg:loom
-  []
-  (let [g (loom-graph/digraph)]
-    (LPG:Loom. g)))
+  "Default to NOOP logger, but allow clients to provide a logging implementation.  We provide one they can use."
+  ([]
+   (->lpg:loom (LPG-Noop-Logger.)))
+  ([logger]
+   (LPG:Loom. (loom-graph/digraph) logger)))
 
 
 (defrecord LPG:Scratch
-  [g]
+  [g logger]
 
   LPG
 
@@ -218,6 +270,7 @@
 
   (from-json
     [this json-string]
+    (info logger [::from-json {:count (count json-string)}])
     (let [data (json/parse-string json-string)
           data (-> data
                    (assoc :attrs (get data "attrs"))
@@ -233,6 +286,7 @@
   (get-nodes-query
     [this {by-outgoing-edge-attrs :by-outgoing-edge-attrs
            :as                    query}]
+    (info logger [::get-nodes-query query])
     (->>
       (filter (fn [[n1 n2]]
                 (let [attrs-map (get-attrs-for-edge this [n1 n2])]
@@ -247,6 +301,7 @@
            g-map      :map
            g-reduce   :reduce
            :as        query}]
+    (info logger [::aggregate-nodes-query query])
     (if g-group-by
       (->> (:edges g)
            (filter (fn [[n1 n2]]
@@ -269,11 +324,15 @@
            (reduce-grouped-values g-reduce))))
 
 
-  (add-node [this node] (assoc this :g (update g :nodes concat [node])))
+  (add-node
+    [this node]
+    (info logger [::add-node node])
+    (assoc this :g (update g :nodes concat [node])))
 
 
   (add-attr-to-edge
     [this edge attr-key]
+    (info logger [::add-attr-to-edge edge attr-key])
     (assoc this :g (-> g
                        (update :edges concat [edge])
                        (assoc-in [:attrs (first edge) (second edge) attr-key] true))))
@@ -324,6 +383,8 @@
 
 
 (defn ->lpg:scratch
-  []
-  (let [g {}]
-    (LPG:Scratch. g)))
+  "Default to NOOP logger, but allow clients to provide a logging implementation.  We provide one they can use."
+  ([]
+   (->lpg:scratch (LPG-Noop-Logger.)))
+  ([logger]
+   (LPG:Scratch. {} logger)))

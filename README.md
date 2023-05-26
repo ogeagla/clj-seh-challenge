@@ -58,7 +58,8 @@ See the test namespace for more documentation about the tests.
       ;; For a noisier, logging version, provide a logging implementation that emits logs:
       g                    (lpg/->lpg:scratch (lpg/LPG-Timbre-Logger.))
 
-      ;; Add nodes: the data structure is immutable, calling a mutating method (like add-node) returns a new one containing updated internal state
+      ;; Add nodes: the data structure is immutable, calling a mutating method (like add-node)
+      ;;   returns a new one containing updated internal state
       g                    (->
                              g
                              (lpg/add-node "desk")
@@ -108,7 +109,7 @@ See the test namespace for more documentation about the tests.
       ;; For nodes which are parents of a provided label,
       ;;  map the nodes to children of another provided label,
       ;;  and reduce those children with provided function.
-      ;; In this case, that means: "what containers of writing tools have how many writing tool styles"
+      ;; In this case, that means: "containers of writing tools have how many writing styles?"
       containers-can-write (lpg/aggregate-nodes-query
                              g
                              {:group-by "contains"
@@ -117,8 +118,9 @@ See the test namespace for more documentation about the tests.
       ;; => {"desk" {"0.7mm"  1, "yellow" 1}, "briefcase" {"0.7mm"  1, "blue ink" 1}}
 
 
-      ;; Here we omit the :group-by key, which removes the previous first step of finding the parent nodes
-      ;;  to group the reduction.  In this case, the rest of the query applies to the whole graph.
+      ;; Here we omit the :group-by key, which removes the previous first step of finding
+      ;;  the parent nodes to group the reduction.  In this case, the rest of the query 
+      ;;  applies to the whole graph.
       all-can-write        (lpg/aggregate-nodes-query
                              g
                              {:map    "writes"
@@ -137,6 +139,7 @@ See the test namespace for more documentation about the tests.
 ## TODO
 Here's what I think might be missing. A lot of these can be done outside lib using existing methods,
 but a better version of this library would probably include these:
+
 - a traverse method (BF/DF)
 - labels for nodes.  it was a design decision to omit node labels in this impl, a better version might include this
 - subgraph method

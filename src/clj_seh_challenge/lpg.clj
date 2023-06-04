@@ -1,6 +1,7 @@
 (ns clj-seh-challenge.lpg
   (:require
     [cheshire.core :as json]
+    [loom.alg :as loom-alg]
     [loom.attr :as loom-attr]
     [loom.derived :as loom-derived]
     [loom.graph :as loom-graph]
@@ -58,13 +59,19 @@
 
   ;; TODO: Here's what I think might be missing. A lot of these can be done outside lib using existing methods,
   ;; but a better version of this library would probably include these:
-  ;; - a traverse method (BF/DF)
+  ;; x BF traverse method
+  ;; - DF traverse method
   ;; - labels for nodes.  it was a design decision to omit node labels in this impl, a better version might include this
   ;; - subgraph method
   ;; - path method
   ;; - method to return all nodes reachable from a provided node
   ;; - a hook to visualize (loom has a method that uses graphviz, my impl would need to use that or something from scratch)
   ;; - delete nodes/edges
+
+  (bf-traverse
+    [this start-node]
+    "Breadth-first traverse starting from a given node.  Start node cannot be nil.  Execution is eager and
+    ordering returned is not guaranteed to be consistent between implementations.")
 
   (add-node
     [this node]
@@ -247,7 +254,12 @@
                 (when (get-attr-for-edge this [n1 n2] attr-key)
                   n1)))
          (remove nil?)
-         vec)))
+         vec))
+
+
+  (bf-traverse
+    [this start-node]
+    (vec (loom-alg/bf-traverse g start-node))))
 
 
 (defn ->lpg:loom
@@ -281,6 +293,25 @@
 
 
   (get-nodes [this] (-> g :nodes vec))
+
+
+  (bf-traverse
+    [this start-node]
+    (vec (loop [nodes        []
+                descend-into [start-node]]
+           (if (seq descend-into)
+             (recur
+               (concat nodes descend-into)
+               (->>
+                 descend-into
+                 (map (fn [n]
+                        (->>
+                          (:edges g)
+                          (filter (fn [[n1 n2]]
+                                    (= n n1)))
+                          (map second))))
+                 (mapcat identity)))
+             nodes))))
 
 
   (get-nodes-query

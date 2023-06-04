@@ -5,7 +5,8 @@
     [clojure.test :refer :all]
     [loom.io :as loom-io])
   (:import
-    (clj_seh_challenge.lpg LPG-Timbre-Logger)
+    (clj_seh_challenge.lpg
+      LPG-Timbre-Logger)
     (java.util
       Date)))
 
@@ -159,46 +160,53 @@
     ;;  and find the most frequent food preferences to make lunch choices by "team"
 
     ;; who does fred manage?
-    (is (= (set (lpg/get-child-nodes-with-attr lpg-impl fred manages))
-           #{roger barney dan bob}))
+    (is (= #{roger barney dan bob}
+           (set (lpg/get-child-nodes-with-attr lpg-impl fred manages))))
 
     ;; who prefers french?
-    (is (= (lpg/get-parent-nodes-with-attr lpg-impl french prefers)
-           [jim ron]))
+    (is (= [jim ron]
+           (lpg/get-parent-nodes-with-attr lpg-impl french prefers)))
 
     ;; who are the managers?
-    (is (= (lpg/get-nodes-query lpg-impl
-                                {:by-outgoing-edge-attrs (fn [attrs] (get attrs manages))})
-           #{fred sarah}))
+    (is (= #{fred sarah}
+           (lpg/get-nodes-query lpg-impl
+                                {:by-outgoing-edge-attrs (fn [attrs] (get attrs manages))})))
 
 
     ;; for each group of "managed", what is the most preferred cuisine?
-    (is (= (lpg/aggregate-nodes-query lpg-impl
+    (is (= {"sarah" {"french" 2, "indian" 1},
+            "fred"  {"indian" 2, "mexican" 1, "thai" 1}}
+           (lpg/aggregate-nodes-query lpg-impl
                                       {:group-by manages
                                        :map      prefers
-                                       :reduce   count})
-           {"sarah" {"french" 2, "indian" 1},
-            "fred"  {"indian" 2, "mexican" 1, "thai" 1}}))
+                                       :reduce   count})))
 
     ;; for the same groups, what are people allergic to?
-    (is (= (lpg/aggregate-nodes-query lpg-impl
+    (is (= {"sarah" {"dairy" 1, "shellfish" 1},
+            "fred"  {"fun" 1}}
+           (lpg/aggregate-nodes-query lpg-impl
                                       {:group-by manages
                                        :map      allergic-to
-                                       :reduce   count})
-           {"sarah" {"dairy" 1, "shellfish" 1},
-            "fred"  {"fun" 1}}))
+                                       :reduce   count})))
 
     ;; what if we want overall preferences?
-    (is (= (lpg/aggregate-nodes-query lpg-impl
+    (is (= {"french" 2, "indian" 3, "mexican" 2, "thai" 1, "texmex" 1}
+           (lpg/aggregate-nodes-query lpg-impl
                                       {:map    prefers
-                                       :reduce count})
-           {"french" 2, "indian" 3, "mexican" 2, "thai" 1, "texmex" 1}))
+                                       :reduce count})))
 
     ;; and overall allergies?
-    (is (= (lpg/aggregate-nodes-query lpg-impl
+    (is (= {"dairy" 1, "fun" 1, "shellfish" 1}
+           (lpg/aggregate-nodes-query lpg-impl
                                       {:map    allergic-to
-                                       :reduce count})
-           {"dairy" 1, "fun" 1, "shellfish" 1}))
+                                       :reduce count})))
+
+    ;; BF traverse starting from the 2 topmost nodes of the test graph
+    (is (= #{fred roger bob mexican barney dan indian fun thai}
+           (set (lpg/bf-traverse lpg-impl fred))))
+
+    (is (= #{sarah jim ron david texmex french dairy indian shellfish}
+           (set (lpg/bf-traverse lpg-impl sarah))))
 
     (is (let [end-ms (-> (Date.) .getTime)]
           (println "Simple Test Took " (type impl) " : " (float (/ (- end-ms start-ms) 1000)) " s")

@@ -36,7 +36,7 @@ Slurp Serialize Test Took  clj_seh_challenge.lpg.LPG:Scratch  :  0.003  s
 Simple Test Took  clj_seh_challenge.lpg.LPG:Loom  :  0.014  s
 Perf Test Took  clj_seh_challenge.lpg.LPG:Loom  :  0.246  s
 
-Ran 2 tests containing 27 assertions.
+Ran 2 tests containing 31 assertions.
 0 failures, 0 errors.
 ```
 
@@ -140,13 +140,14 @@ See the test namespace for more documentation about the tests.
 Here's what I think might be missing. A lot of these can be done outside lib using existing methods,
 but a better version of this library would probably include these:
 
-- a traverse method (BF/DF)
-- labels for nodes.  it was a design decision to omit node labels in this impl, a better version might include this
-- subgraph method
-- path method
-- method to return all nodes reachable from a provided node
-- a hook to visualize (loom has a method that uses graphviz, my impl would need to use that or something from scratch)
-- delete nodes/edges
+- [x] BF traverse method 
+- [ ] DF traverse method
+- [ ] labels for nodes.  it was a design decision to omit node labels in this impl, a better version might include this
+- [ ] subgraph method
+- [ ] path method
+- [ ] method to return all nodes reachable from a provided node
+- [ ] a hook to visualize (loom has a method that uses graphviz, my impl would need to use that or something from scratch)
+- [ ] delete nodes/edges
 
 ## License
 
